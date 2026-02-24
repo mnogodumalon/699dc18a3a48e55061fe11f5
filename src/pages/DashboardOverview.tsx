@@ -188,7 +188,7 @@ export default function DashboardOverview() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(artikel => (
             <ArtikelCard
               key={artikel.record_id}
@@ -241,9 +241,9 @@ function ArtikelCard({
   const kategorieKey = lookupKey(artikel.fields.kategorie);
 
   return (
-    <div className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+    <div className="bg-card border border-border rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200 flex flex-col">
       {/* Photo / Placeholder */}
-      <div className="relative h-40 bg-muted flex items-center justify-center overflow-hidden">
+      <div className="relative h-52 bg-muted flex items-center justify-center overflow-hidden">
         {artikel.fields.fotos ? (
           <img
             src={artikel.fields.fotos}
@@ -252,32 +252,16 @@ function ArtikelCard({
             onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
         ) : (
-          <div className="flex flex-col items-center gap-2 text-muted-foreground/40">
-            <Package size={32} />
+          <div className="flex flex-col items-center gap-2 text-muted-foreground/30">
+            <Package size={40} />
             <span className="text-xs">Kein Foto</span>
           </div>
         )}
 
-        {/* Action buttons overlay */}
-        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={onEdit}
-            className="w-7 h-7 rounded-lg bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background shadow-sm"
-          >
-            <Pencil size={13} className="text-foreground" />
-          </button>
-          <button
-            onClick={onDelete}
-            className="w-7 h-7 rounded-lg bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-destructive/10 shadow-sm"
-          >
-            <Trash2 size={13} className="text-destructive" />
-          </button>
-        </div>
-
         {/* Zustand badge */}
         {zustandKey && (
-          <div className="absolute bottom-2 left-2">
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${ZUSTAND_COLORS[zustandKey] ?? 'bg-gray-100 text-gray-700'}`}>
+          <div className="absolute bottom-3 left-3">
+            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full shadow-sm ${ZUSTAND_COLORS[zustandKey] ?? 'bg-gray-100 text-gray-700'}`}>
               {displayLookup(artikel.fields.zustand)}
             </span>
           </div>
@@ -285,44 +269,60 @@ function ArtikelCard({
       </div>
 
       {/* Content */}
-      <div className="p-3 flex flex-col gap-2 flex-1">
+      <div className="p-4 flex flex-col gap-3 flex-1">
         {kategorieKey && (
-          <span className={`self-start text-xs font-medium px-2 py-0.5 rounded-md border ${KATEGORIE_COLORS[kategorieKey] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+          <span className={`self-start text-xs font-medium px-2.5 py-1 rounded-md border ${KATEGORIE_COLORS[kategorieKey] ?? 'bg-gray-50 text-gray-600 border-gray-200'}`}>
             {KATEGORIEN[kategorieKey] ?? displayLookup(artikel.fields.kategorie)}
           </span>
         )}
 
-        <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-2">
+        <h3 className="font-bold text-foreground text-base leading-snug line-clamp-2">
           {artikel.fields.artikelname ?? '—'}
         </h3>
 
         {artikel.fields.beschreibung && (
-          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+          <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
             {artikel.fields.beschreibung}
           </p>
         )}
 
-        <div className="mt-auto pt-2 flex items-end justify-between gap-2">
+        <div className="mt-auto pt-3 flex items-end justify-between gap-2 border-t border-border/50">
           <div>
             {artikel.fields.preis != null ? (
-              <span className="text-lg font-bold text-foreground">
+              <span className="text-xl font-bold text-foreground">
                 {formatCurrency(artikel.fields.preis)}
               </span>
             ) : (
               <span className="text-sm text-muted-foreground italic">Preis auf Anfrage</span>
             )}
+            {(artikel.fields.stadt || artikel.fields.postleitzahl) && (
+              <div className="flex items-center gap-1 text-muted-foreground text-xs mt-0.5">
+                <MapPin size={11} />
+                <span>{[artikel.fields.postleitzahl, artikel.fields.stadt].filter(Boolean).join(' ')}</span>
+              </div>
+            )}
           </div>
-          {(artikel.fields.stadt || artikel.fields.postleitzahl) && (
-            <div className="flex items-center gap-1 text-muted-foreground text-xs shrink-0">
-              <MapPin size={11} />
-              <span>{[artikel.fields.postleitzahl, artikel.fields.stadt].filter(Boolean).join(' ')}</span>
-            </div>
-          )}
+
+          {/* Action buttons — always visible */}
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={onEdit}
+              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              <Pencil size={15} />
+            </button>
+            <button
+              onClick={onDelete}
+              className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center hover:bg-destructive/10 hover:text-destructive transition-colors"
+            >
+              <Trash2 size={15} />
+            </button>
+          </div>
         </div>
 
         {(artikel.fields.vorname || artikel.fields.nachname) && (
-          <div className="pt-2 border-t border-border/50 text-xs text-muted-foreground">
-            {[artikel.fields.vorname, artikel.fields.nachname].filter(Boolean).join(' ')}
+          <div className="text-xs text-muted-foreground">
+            von {[artikel.fields.vorname, artikel.fields.nachname].filter(Boolean).join(' ')}
             {artikel.createdat && (
               <span className="ml-2 opacity-60">· {formatDate(artikel.createdat)}</span>
             )}
